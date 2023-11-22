@@ -29,8 +29,11 @@ public class Product implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
+	
 	private String name;
+	
 	private int price;
+	
 	private int account;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
@@ -41,6 +44,5 @@ public class Product implements Serializable {
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name="picture", columnDefinition = "longblob")
 	private byte[] picture;
-	
 	
 }
