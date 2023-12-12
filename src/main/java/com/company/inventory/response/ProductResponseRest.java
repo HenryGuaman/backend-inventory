@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProductResponseRest extends ResponseRest {
+public class ProductResponseRest extends ResponseRest{
 	
 	private ProductResponse product = new ProductResponse();
 

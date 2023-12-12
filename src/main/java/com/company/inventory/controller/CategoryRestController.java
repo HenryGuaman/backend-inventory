@@ -1,5 +1,7 @@
 package com.company.inventory.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,41 +17,52 @@ import org.springframework.web.bind.annotation.RestController;
 import com.company.inventory.model.Category;
 import com.company.inventory.response.CategoryResponseRest;
 import com.company.inventory.service.ICategoryService;
+import com.company.inventory.util.CategoryExcelExport;
 
-@CrossOrigin(origins= {"http://localhost:4200"})
+import jakarta.servlet.http.HttpServletResponse;
+
+@CrossOrigin(origins = {"http://localhost:4200"})
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("/api/v1")
 public class CategoryRestController {
 	
 	@Autowired
 	private ICategoryService service;
 	
+	
 	/**
-	 * get all categories
-	 * **/	
+	 * get all the categories
+	 * @return
+	 */
 	@GetMapping("/categories")
-	public ResponseEntity<CategoryResponseRest> searchCategories(){
+	public ResponseEntity<CategoryResponseRest> searchCategories() {
+		
 		ResponseEntity<CategoryResponseRest> response = service.search();
 		return response;
 	}
 	
 	/**
 	 * get categories by id
-	 * **/
+	 * @param id
+	 * @return
+	 */
 	@GetMapping("/categories/{id}")
-	public ResponseEntity<CategoryResponseRest> searchCategoriesById(@PathVariable Long id){
+	public ResponseEntity<CategoryResponseRest> searchCategoriesById(@PathVariable Long id) {
+		
 		ResponseEntity<CategoryResponseRest> response = service.searchById(id);
 		return response;
 	}
 	
 	/**
 	 * save categories
-	 * **/
+	 * @param Category
+	 * @return
+	 */
 	@PostMapping("/categories")
-	public ResponseEntity<CategoryResponseRest> save(@RequestBody Category category){
+	public ResponseEntity<CategoryResponseRest> save(@RequestBody Category category) {
 		
 		ResponseEntity<CategoryResponseRest> response = service.save(category);
-		return response;	
+		return response;
 	}
 	
 	/**
@@ -59,22 +72,44 @@ public class CategoryRestController {
 	 * @return
 	 */
 	@PutMapping("/categories/{id}")
-	public ResponseEntity<CategoryResponseRest> update(@RequestBody Category category, @PathVariable Long id){
+	public ResponseEntity<CategoryResponseRest> update(@RequestBody Category category, @PathVariable Long id) {
 		
 		ResponseEntity<CategoryResponseRest> response = service.update(category, id);
 		return response;
-		
 	}
+	
 	/**
-	 * delete categorias
+	 * delete categorie
 	 * @param id
 	 * @return
 	 */
 	@DeleteMapping("/categories/{id}")
-	public ResponseEntity<CategoryResponseRest> deleteCategoriesById(@PathVariable Long id){
+	public ResponseEntity<CategoryResponseRest> delete(@PathVariable Long id) {
+		
 		ResponseEntity<CategoryResponseRest> response = service.deleteById(id);
 		return response;
 	}
 	
+	/**
+	 * export to excel
+	 * @param response
+	 * @throws IOException
+	 */
+	@GetMapping("categories/export/excel")
+	public void exportToExcel(HttpServletResponse response) throws IOException{
+		response.setContentType("application/octet-stream");
+		
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=result_category.xlsx";
+		response.setHeader(headerKey, headerValue);
+		
+		ResponseEntity<CategoryResponseRest> categoryResponse = service.search();
+		
+		CategoryExcelExport excelExporter = new CategoryExcelExport(
+				categoryResponse.getBody().getCategoryResponse().getCategory());
+		
+		excelExporter.export(response);
+	}
 	
+
 }
